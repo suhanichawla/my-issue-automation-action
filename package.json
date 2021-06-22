@@ -19,6 +19,8 @@
   },
   "homepage": "https://github.com/suhanichawla/my-issue-automation-action#readme",
   "dependencies": {
+    "@actions/core": "^1.4.0",
+    "@actions/github": "^5.0.0",
     "@vercel/ncc": "^0.28.6"
   }
 }
