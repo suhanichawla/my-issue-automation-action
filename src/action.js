@@ -11,7 +11,7 @@ async function run() {
     console.log("context",context)
     console.log("issue",issue)
 
-    await octokit.issues.createComment({
+    await octokit.rest.issues.createComment({
         ...context.repo,
         issue_number: issue.number,
         body: 'Thank you for the issue'
