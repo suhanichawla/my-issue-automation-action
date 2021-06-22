@@ -1,0 +1,24 @@
+{
+  "name": "my-issue-automation-action",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "ncc build src/action.js -o dist",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/suhanichawla/my-issue-automation-action.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/suhanichawla/my-issue-automation-action/issues"
+  },
+  "homepage": "https://github.com/suhanichawla/my-issue-automation-action#readme",
+  "dependencies": {
+    "@vercel/ncc": "^0.28.6"
+  }
+}
