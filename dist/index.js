@@ -6287,11 +6287,15 @@ async function run() {
     const { context = {} } = github;
     const { issue } = context.payload;
     console.log("context",context)
-    console.log("issue",issue.body)
+    var bodysplit = issue.body.split('\r\n')
+    console.log("issue",bodysplit)
 
     var rbody= removeIgnoreTaskLitsText(issue.body)
     const text = createTaskListText(rbody)
     console.log("text is", text)
+    //divide into three sections
+    //treat each as body and find how many are unchecked in each, or if all are checked
+    // if all basic checks are checked and webhook check also, send email for financial onboarding
     await octokit.rest.issues.createComment({
         ...context.repo,
         issue_number: issue.number,
