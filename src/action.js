@@ -12,7 +12,7 @@ async function run() {
     var bodysplit = issue.body.split('\r\n')
     console.log("issue body split")
     for (let i=0;i<bodysplit.length;i++){
-        "el at index "+i+" is "+bodysplit[i] 
+        console.log("el at index "+i+" is "+bodysplit[i] )
     }
 
     var rbody= removeIgnoreTaskLitsText(issue.body)
