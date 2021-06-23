@@ -14,18 +14,44 @@ async function run() {
     for (let i=0;i<bodysplit.length;i++){
         console.log("el at index "+i+" is "+bodysplit[i] )
     }
+    var basic_checks=removeIgnoreTaskLitsText(bodysplit[8])
+    var webhook_check=removeIgnoreTaskLitsText(bodysplit[10])
+    var financial_onboarding_checks=removeIgnoreTaskLitsText(bodysplit[12])
 
-    var rbody= removeIgnoreTaskLitsText(issue.body)
-    const text = createTaskListText(rbody)
-    console.log("text is", text)
+    if(areChecksCompleted(basic_checks)){
+        await octokit.rest.issues.createComment({
+            ...context.repo,
+            issue_number: issue.number,
+            body: "basic checks completed"
+        })
+    }
+    if(areChecksCompleted(webhook_check)){
+        await octokit.rest.issues.createComment({
+            ...context.repo,
+            issue_number: issue.number,
+            body: "webhook checks completed"
+        })
+
+    }
+    if(areChecksCompleted(financial_onboarding_checks)){
+        await octokit.rest.issues.createComment({
+            ...context.repo,
+            issue_number: issue.number,
+            body: "financial checks completed"
+        })
+    }
+
+    // var rbody= removeIgnoreTaskLitsText(issue.body)
+    // const text = createTaskListText(rbody)
+    //console.log("text is", text)
     //divide into three sections
     //treat each as body and find how many are unchecked in each, or if all are checked
     // if all basic checks are checked and webhook check also, send email for financial onboarding
-    await octokit.rest.issues.createComment({
-        ...context.repo,
-        issue_number: issue.number,
-        body: text
-    })
+    // await octokit.rest.issues.createComment({
+    //     ...context.repo,
+    //     issue_number: issue.number,
+    //     body: text
+    // })
 }
 
 function removeIgnoreTaskLitsText(text) {
@@ -35,6 +61,15 @@ function removeIgnoreTaskLitsText(text) {
     )
   }
   
+function areChecksCompleted(body){
+    const uncompletedTasks = body.match(/(- \[[ ]\].+)/g)
+    if(uncompletedTasks == null){
+        return true
+    }else{
+        return false
+    }
+}
+
 function createTaskListText(body) {
     const completedTasks = body.match(/(- \[[x]\].+)/g)
     const uncompletedTasks = body.match(/(- \[[ ]\].+)/g)
