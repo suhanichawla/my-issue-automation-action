@@ -6288,7 +6288,10 @@ async function run() {
     const { issue } = context.payload;
     console.log("context",context)
     var bodysplit = issue.body.split('\r\n')
-    console.log("issue",bodysplit)
+    console.log("issue body split")
+    for (let i=0;i<bodysplit.length;i++){
+        "el at index "+i+" is "+bodysplit[i] 
+    }
 
     var rbody= removeIgnoreTaskLitsText(issue.body)
     const text = createTaskListText(rbody)
