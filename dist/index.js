@@ -6287,7 +6287,7 @@ async function run() {
     const { context = {} } = github;
     const { issue } = context.payload;
     console.log("context",context)
-    var bodysplit = issue.body.split('\r\n')
+    var bodysplit = issue.body.split('**')
     console.log("issue body split")
     for (let i=0;i<bodysplit.length;i++){
         console.log("el at index "+i+" is "+bodysplit[i] )
