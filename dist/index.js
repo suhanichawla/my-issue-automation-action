@@ -6287,37 +6287,50 @@ async function run() {
     const { context = {} } = github;
     const { issue } = context.payload;
     console.log("context",context)
-    var bodysplit = issue.body.split('**')
-    console.log("issue body split")
-    for (let i=0;i<bodysplit.length;i++){
-        console.log("el at index "+i+" is "+bodysplit[i] )
+    if(issue.labels.contains("financial-onboarding")){
+      if (context.eventName == 'issues' && (context.payload.action == 'edited' || context.payload.action == 'opened')){
+        //check which case is this
+        if(issue.title.includes("Onboarding Pending Verification from Draft App")){
+          //draft app steps
+          var bodysplit = issue.body.split('**')
+          for (let i=0;i<bodysplit.length;i++){
+            console.log("el at index "+i+" is "+bodysplit[i] )
+          }
+        }else if(issue.title.includes("Onboarding Pending Verification from Unverified App")){
+          //unverified app steps
+          var bodysplit = issue.body.split('**')
+          for (let i=0;i<bodysplit.length;i++){
+            console.log("el at index "+i+" is "+bodysplit[i] )
+          }
+        }
+      }
     }
-    var basic_checks=removeIgnoreTaskLitsText(bodysplit[8])
-    var webhook_check=removeIgnoreTaskLitsText(bodysplit[10])
-    var financial_onboarding_checks=removeIgnoreTaskLitsText(bodysplit[12])
+    // var bodysplit = issue.body.split('**')
+    // console.log("issue body split")
+    // for (let i=0;i<bodysplit.length;i++){
+    //     console.log("el at index "+i+" is "+bodysplit[i] )
+    // }
+    // var basic_checks=removeIgnoreTaskLitsText(bodysplit[8])
+    // var webhook_check=removeIgnoreTaskLitsText(bodysplit[10])
+    // var financial_onboarding_checks=removeIgnoreTaskLitsText(bodysplit[12])
 
-    if(areChecksCompleted(basic_checks)){
-        await octokit.rest.issues.createComment({
-            ...context.repo,
-            issue_number: issue.number,
-            body: "basic checks completed"
-        })
-    }
-    if(areChecksCompleted(webhook_check)){
-        await octokit.rest.issues.createComment({
-            ...context.repo,
-            issue_number: issue.number,
-            body: "webhook checks completed"
-        })
+    // if(areChecksCompleted(basic_checks) && areChecksCompleted(webhook_check) && !areChecksCompleted(financial_onboarding_checks)){
+    //   //check if form sent tag has already been added
 
-    }
-    if(areChecksCompleted(financial_onboarding_checks)){
-        await octokit.rest.issues.createComment({
-            ...context.repo,
-            issue_number: issue.number,
-            body: "financial checks completed"
-        })
-    }
+    //     await octokit.rest.issues.createComment({
+    //         ...context.repo,
+    //         issue_number: issue.number,
+    //         body: "basic checks completed"
+    //     })
+    // }
+    
+    // if(areChecksCompleted(financial_onboarding_checks)){
+    //     await octokit.rest.issues.createComment({
+    //         ...context.repo,
+    //         issue_number: issue.number,
+    //         body: "financial checks completed"
+    //     })
+    // }
 
     // var rbody= removeIgnoreTaskLitsText(issue.body)
     // const text = createTaskListText(rbody)
