@@ -6287,7 +6287,7 @@ async function run() {
     const { context = {} } = github;
     const { issue } = context.payload;
     console.log("issue",issue.labels)
-    const hasFinancialLabel= issues.some(function(el) {
+    const hasFinancialLabel= issue.labels.some(function(el) {
       return el.name === 'financial-onboarding'
     });
     if(hasFinancialLabel){
