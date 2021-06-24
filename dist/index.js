@@ -6287,11 +6287,15 @@ async function run() {
     const { context = {} } = github;
     const { issue } = context.payload;
     console.log("issue",issue.labels)
+    console.log("calling func check form")
+    check_form_sent()
     const hasFinancialLabel= issue.labels.some(function(el) {
       return el.name === 'financial-onboarding'
     });
     if(hasFinancialLabel){
       if (context.eventName == 'issues' && (context.payload.action == 'edited' || context.payload.action == 'opened')){
+        //check if all tasks are completed, close the issue
+
         //check which case is this
         if(issue.title.includes("Onboarding Pending Verification from Draft App")){
           //draft app steps
@@ -6313,13 +6317,25 @@ async function run() {
                 issue_number: issue.number,
                 labels: ["form-sent"]
               })
+              //tick the form sent check
+              // var updated_body = check_form_sent()
+              // octokit.rest.issues.update({
+              //   ...context.repo,
+              //   issue_number: issue.number,
+              //   body: updated_body,
+              // });
             }
+            //check if first recieved is checked, if yes tag accounts payable
           }
         }else if(issue.title.includes("Onboarding Pending Verification from Unverified App")){
           //unverified app steps
           var bodysplit = issue.body.split('**')
-          for (let i=0;i<bodysplit.length;i++){
-            console.log("el at index "+i+" is "+bodysplit[i] )
+          var webhook_check_index = bodysplit.indexOf("WebHook Check");
+          var webhook_check=removeIgnoreTaskLitsText(bodysplit[webhook_check_index - 1])
+          if(areChecksCompleted(basic_checks) && areChecksCompleted(webhook_check)){
+            // check mark Financial onboarding initial data fetched
+
+            //check if first recieved is checked, if yes tag accounts payable
           }
         }
       }
@@ -6370,7 +6386,15 @@ function removeIgnoreTaskLitsText(text) {
       ''
     )
   }
-  
+
+  function check_form_sent(){
+    var bodysplit = issue.body.split('**')
+    console.log("bodysplit",bodysplit)
+    var financial_onboarding_checks_index = bodysplit.indexOf("Financial Onboarding");
+    var eachcheck=bodysplit[financial_onboarding_checks_index].split("\r\n")
+    console.log("eachcheck", eachcheck)
+  }
+
 function areChecksCompleted(body){
     const uncompletedTasks = body.match(/(- \[[ ]\].+)/g)
     if(uncompletedTasks == null){
