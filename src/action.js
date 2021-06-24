@@ -122,7 +122,7 @@ function removeIgnoreTaskLitsText(text) {
       }
     }
     //merge the financial onboarding list
-    eachcheck = eachcheck.join("\r\n")
+    bodysplit[financial_onboarding_checks_index+1] = eachcheck.join("\r\n")
     //merge the entire body
 
     bodysplit = bodysplit.join("**")
