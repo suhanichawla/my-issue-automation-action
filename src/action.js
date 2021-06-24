@@ -115,6 +115,11 @@ function removeIgnoreTaskLitsText(text) {
     var financial_onboarding_checks_index = bodysplit.indexOf("Financial Onboarding");
     var eachcheck=bodysplit[financial_onboarding_checks_index+1].split("\r\n")
     console.log("eachcheck", eachcheck)
+    for(let i=0;i<eachcheck.length;i++){
+      if(eachcheck[i].includes("Financial onboarding initial data fetched.")){
+        changeToChecked(eachcheck[i])
+      }
+    }
   }
 
 function areChecksCompleted(body){
@@ -124,6 +129,14 @@ function areChecksCompleted(body){
     }else{
         return false
     }
+}
+
+function changeToChecked(text){
+  const isInComplete = text.match(/(- \[[ ]\].+)/g)
+  if(isInComplete){
+    var newtext= text.replace((/(- \[[ ]\].+)/g, /(- \[[x]\].+)/g))
+    console.log("newtext",newtext)
+  }
 }
 
 function createTaskListText(body) {
