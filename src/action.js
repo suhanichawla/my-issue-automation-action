@@ -54,6 +54,14 @@ async function run() {
           //     body: "tagging @suhanichawla and @accountpayable"
           // })
             //check if first recieved is checked, if yes tag accounts payable
+            if(check_if_form_data_fetched(issue)){
+              //tag issue payable
+                await octokit.rest.issues.createComment({
+                  ...context.repo,
+                  issue_number: issue.number,
+                  body: "tagging @suhanichawla and @accountpayable"
+                })
+            }
             
           }
         }else if(issue.title.includes("Onboarding Pending Verification from Unverified App")){
@@ -115,6 +123,24 @@ function removeIgnoreTaskLitsText(text) {
       ''
     )
   }
+
+function check_if_form_data_fetched(issue){
+  var bodysplit = issue.body.split('**')
+  // console.log("bodysplit",bodysplit)
+  var financial_onboarding_checks_index = bodysplit.indexOf("Financial Onboarding");
+  var eachcheck=bodysplit[financial_onboarding_checks_index+1].split("\r\n")
+  // console.log("eachcheck", eachcheck)
+  for(let i=0;i<eachcheck.length;i++){
+    if(eachcheck[i].includes(" Financial onboarding initial data fetched.")){
+      var check=removeIgnoreTaskLitsText(eachcheck[i])
+      if(areChecksCompleted(check)){
+        return true
+      }else{
+        return false
+      }
+    }
+  }
+}
   
 
   function check_form_sent(issue){
