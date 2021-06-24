@@ -2,21 +2,29 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 
 async function run() {
-    console.log("Hello world!")
-    const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN')
-    const octokit =  github.getOctokit(GITHUB_TOKEN)
+  console.log("Hello world!")
+  const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN')
+  const octokit =  github.getOctokit(GITHUB_TOKEN)
 
-    const { context = {} } = github;
-    const { issue } = context.payload;
-    console.log("issue",issue.labels)
-    console.log("calling func check form")
-    const hasFinancialLabel= issue.labels.some(function(el) {
-      return el.name === 'financial-onboarding'
-    });
-    if(hasFinancialLabel){
-      if (context.eventName == 'issues' && (context.payload.action == 'edited' || context.payload.action == 'opened')){
-        //check if all tasks are completed, close the issue
-
+  const { context = {} } = github;
+  const { issue } = context.payload;
+  console.log("issue",issue.labels)
+  console.log("calling func check form")
+  const hasFinancialLabel= issue.labels.some(function(el) {
+    return el.name === 'financial-onboarding'
+  });
+  if(hasFinancialLabel){
+    if (context.eventName == 'issues' && (context.payload.action == 'edited' || context.payload.action == 'opened')){
+      //check if all tasks are completed, close the issue
+      var issueBody=removeIgnoreTaskLitsText(issue.body)
+      if(areChecksCompleted(issueBody)){
+        //close the issue
+        await octokit.rest.issues.update({
+          ...context.repo,
+          issue_number: issue.number,
+          state: 'closed'
+        })
+      }else{
         //check which case is this
         if(issue.title.includes("Onboarding Pending Verification from Draft App")){
           //draft app steps
@@ -90,45 +98,8 @@ async function run() {
           }
         }
       }
-    }
-    // var bodysplit = issue.body.split('**')
-    // console.log("issue body split")
-    // for (let i=0;i<bodysplit.length;i++){
-    //     console.log("el at index "+i+" is "+bodysplit[i] )
-    // }
-    // var basic_checks=removeIgnoreTaskLitsText(bodysplit[8])
-    // var webhook_check=removeIgnoreTaskLitsText(bodysplit[10])
-    // var financial_onboarding_checks=removeIgnoreTaskLitsText(bodysplit[12])
-
-    // if(areChecksCompleted(basic_checks) && areChecksCompleted(webhook_check) && !areChecksCompleted(financial_onboarding_checks)){
-    //   //check if form sent tag has already been added
-
-    //     await octokit.rest.issues.createComment({
-    //         ...context.repo,
-    //         issue_number: issue.number,
-    //         body: "basic checks completed"
-    //     })
-    // }
-    
-    // if(areChecksCompleted(financial_onboarding_checks)){
-    //     await octokit.rest.issues.createComment({
-    //         ...context.repo,
-    //         issue_number: issue.number,
-    //         body: "financial checks completed"
-    //     })
-    // }
-
-    // var rbody= removeIgnoreTaskLitsText(issue.body)
-    // const text = createTaskListText(rbody)
-    //console.log("text is", text)
-    //divide into three sections
-    //treat each as body and find how many are unchecked in each, or if all are checked
-    // if all basic checks are checked and webhook check also, send email for financial onboarding
-    // await octokit.rest.issues.createComment({
-    //     ...context.repo,
-    //     issue_number: issue.number,
-    //     body: text
-    // })
+    } 
+  }
 }
 
 function check_mark_accounts_payable(issue){
