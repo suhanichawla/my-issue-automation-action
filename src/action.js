@@ -9,7 +9,10 @@ async function run() {
     const { context = {} } = github;
     const { issue } = context.payload;
     console.log("issue",issue.labels)
-    if(issue.labels.contains("financial-onboarding")){
+    const hasFinancialLabel= issues.some(function(el) {
+      return el.name === 'financial-onboarding'
+    });
+    if(hasFinancialLabel){
       if (context.eventName == 'issues' && (context.payload.action == 'edited' || context.payload.action == 'opened')){
         //check which case is this
         if(issue.title.includes("Onboarding Pending Verification from Draft App")){
