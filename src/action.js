@@ -134,7 +134,7 @@ function areChecksCompleted(body){
 function changeToChecked(text){
   const isInComplete = text.match(/(- \[[ ]\].+)/g)
   if(isInComplete){
-    var newtext= text.replace(("[ ]", "[x]"))
+    var newtext= text.replace("[ ]", "[x]")
     console.log("newtext",newtext)
   }
 }
