@@ -18,8 +18,24 @@ async function run() {
         if(issue.title.includes("Onboarding Pending Verification from Draft App")){
           //draft app steps
           var bodysplit = issue.body.split('**')
-          for (let i=0;i<bodysplit.length;i++){
-            console.log("el at index "+i+" is "+bodysplit[i] )
+          var basic_checks_index = bodysplit.indexOf("Basic Checks");
+          var webhook_check_index = bodysplit.indexOf("WebHook Check");
+          var basic_checks=removeIgnoreTaskLitsText(bodysplit[basic_checks_index - 1])
+          var webhook_check=removeIgnoreTaskLitsText(bodysplit[webhook_check_index - 1])
+          if(areChecksCompleted(basic_checks) && areChecksCompleted(webhook_check)){
+            //check if google form label is sent
+            isGoogleFormSent = issue.labels.some(function(el) {
+              return el.name === 'form-sent'
+            });
+            if(!isGoogleFormSent){
+              //send email with google form here
+              //add label
+              octokit.rest.issues.addLabels({
+                ...context.repo,
+                issue_number: issue.number,
+                labels: ["form-sent"]
+              })
+            }
           }
         }else if(issue.title.includes("Onboarding Pending Verification from Unverified App")){
           //unverified app steps
