@@ -10,7 +10,7 @@ async function run() {
     const { issue } = context.payload;
     console.log("issue",issue.labels)
     console.log("calling func check form")
-    check_form_sent()
+    check_form_sent(issue)
     const hasFinancialLabel= issue.labels.some(function(el) {
       return el.name === 'financial-onboarding'
     });
@@ -109,7 +109,7 @@ function removeIgnoreTaskLitsText(text) {
     )
   }
 
-  function check_form_sent(){
+  function check_form_sent(issue){
     var bodysplit = issue.body.split('**')
     console.log("bodysplit",bodysplit)
     var financial_onboarding_checks_index = bodysplit.indexOf("Financial Onboarding");
