@@ -6391,7 +6391,7 @@ function removeIgnoreTaskLitsText(text) {
     var bodysplit = issue.body.split('**')
     console.log("bodysplit",bodysplit)
     var financial_onboarding_checks_index = bodysplit.indexOf("Financial Onboarding");
-    var eachcheck=bodysplit[financial_onboarding_checks_index].split("\r\n")
+    var eachcheck=bodysplit[financial_onboarding_checks_index+1].split("\r\n")
     console.log("eachcheck", eachcheck)
   }
 
