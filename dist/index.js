@@ -6288,7 +6288,6 @@ async function run() {
     const { issue } = context.payload;
     console.log("issue",issue.labels)
     console.log("calling func check form")
-    check_form_sent(issue)
     const hasFinancialLabel= issue.labels.some(function(el) {
       return el.name === 'financial-onboarding'
     });
@@ -6318,14 +6317,22 @@ async function run() {
                 labels: ["form-sent"]
               })
               //tick the form sent check
-              // var updated_body = check_form_sent()
-              // octokit.rest.issues.update({
-              //   ...context.repo,
-              //   issue_number: issue.number,
-              //   body: updated_body,
-              // });
+              // check_form_sent(issue)
+              var updated_body = check_form_sent(issue)
+              octokit.rest.issues.update({
+                ...context.repo,
+                issue_number: issue.number,
+                body: updated_body,
+              });
             }
+            //now also tag account payable
+          //   await octokit.rest.issues.createComment({
+          //     ...context.repo,
+          //     issue_number: issue.number,
+          //     body: "tagging @suhanichawla and @accountpayable"
+          // })
             //check if first recieved is checked, if yes tag accounts payable
+            
           }
         }else if(issue.title.includes("Onboarding Pending Verification from Unverified App")){
           //unverified app steps
@@ -6334,7 +6341,7 @@ async function run() {
           var webhook_check=removeIgnoreTaskLitsText(bodysplit[webhook_check_index - 1])
           if(areChecksCompleted(basic_checks) && areChecksCompleted(webhook_check)){
             // check mark Financial onboarding initial data fetched
-
+            //check_form_sent(issue)
             //check if first recieved is checked, if yes tag accounts payable
           }
         }
@@ -6386,6 +6393,7 @@ function removeIgnoreTaskLitsText(text) {
       ''
     )
   }
+  
 
   function check_form_sent(issue){
     var bodysplit = issue.body.split('**')
@@ -6394,7 +6402,7 @@ function removeIgnoreTaskLitsText(text) {
     var eachcheck=bodysplit[financial_onboarding_checks_index+1].split("\r\n")
     console.log("eachcheck", eachcheck)
     for(let i=0;i<eachcheck.length;i++){
-      if(eachcheck[i].includes("Financial onboarding initial data fetched.")){
+      if(eachcheck[i].includes("Financial onboarding initial form sent.")){
         var checkedoff = changeToChecked(eachcheck[i])
         eachcheck[i]=checkedoff
       }
