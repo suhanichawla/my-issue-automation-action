@@ -41,7 +41,7 @@ async function run() {
               //tick the form sent check
               // check_form_sent(issue)
               var updated_body = check_form_sent(issue)
-              octokit.rest.issues.update({
+              await octokit.rest.issues.update({
                 ...context.repo,
                 issue_number: issue.number,
                 body: updated_body,
@@ -55,13 +55,26 @@ async function run() {
           // })
             //check if first recieved is checked, if yes tag accounts payable
             if(check_if_form_data_fetched(issue)){
-              //tag issue payable
-                await octokit.rest.issues.createComment({
-                  ...context.repo,
-                  issue_number: issue.number,
-                  body: "tagging @suhanichawla"
-                })
-                console.log("just printing issue", issue)
+              //check if accounts payable was already tagged, if not
+              if(check_if_accouts_payable_is_tagged_check(issue)){
+                return
+              }else{
+                  //tag accounts payable
+                  await octokit.rest.issues.createComment({
+                    ...context.repo,
+                    issue_number: issue.number,
+                    body: "tagging @suhanichawla"
+                  })
+                  //check the tick which says accounts payable has been tagged
+                  var updated_body_two= check_mark_accounts_payable(issue)
+                  await octokit.rest.issues.update({
+                    ...context.repo,
+                    issue_number: issue.number,
+                    body: updated_body_two,
+                  });
+                  console.log("just printing issue", issue)
+
+              }
             }
             
           }
@@ -118,6 +131,46 @@ async function run() {
     // })
 }
 
+function check_mark_accounts_payable(issue){
+  var bodysplit = issue.body.split('**')
+  console.log("bodysplit",bodysplit)
+  var financial_onboarding_checks_index = bodysplit.indexOf("Financial Onboarding");
+  var eachcheck=bodysplit[financial_onboarding_checks_index+1].split("\r\n")
+  console.log("eachcheck", eachcheck)
+  for(let i=0;i<eachcheck.length;i++){
+    if(eachcheck[i].includes("@accountspayable tagged to the issue and column updated")){
+      var checkedoff = changeToChecked(eachcheck[i])
+      eachcheck[i]=checkedoff
+    }
+  }
+  //merge the financial onboarding list
+  bodysplit[financial_onboarding_checks_index+1] = eachcheck.join("\r\n")
+  //merge the entire body
+
+  bodysplit = bodysplit.join("**")
+  console.log("joined issue body",bodysplit)
+  return bodysplit
+
+}
+
+function check_if_accouts_payable_is_tagged_check(issue){
+  var bodysplit = issue.body.split('**')
+  // console.log("bodysplit",bodysplit)
+  var financial_onboarding_checks_index = bodysplit.indexOf("Financial Onboarding");
+  var eachcheck=bodysplit[financial_onboarding_checks_index+1].split("\r\n")
+  // console.log("eachcheck", eachcheck)
+  for(let i=0;i<eachcheck.length;i++){
+    if(eachcheck[i].includes("@accountspayable tagged to the issue and column updated")){
+      var check=removeIgnoreTaskLitsText(eachcheck[i])
+      if(areChecksCompleted(check)){
+        return true
+      }else{
+        return false
+      }
+    }
+  }
+}
+
 function removeIgnoreTaskLitsText(text) {
     return text.replace(
       /<!-- ignore-task-list-start -->[\s| ]*(- \[[x| ]\] .+[\s| ]*)+<!-- ignore-task-list-end -->/g,
@@ -132,7 +185,7 @@ function check_if_form_data_fetched(issue){
   var eachcheck=bodysplit[financial_onboarding_checks_index+1].split("\r\n")
   // console.log("eachcheck", eachcheck)
   for(let i=0;i<eachcheck.length;i++){
-    if(eachcheck[i].includes(" Financial onboarding initial data fetched.")){
+    if(eachcheck[i].includes("Financial onboarding initial data fetched.")){
       var check=removeIgnoreTaskLitsText(eachcheck[i])
       if(areChecksCompleted(check)){
         return true
