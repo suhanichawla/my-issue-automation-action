@@ -8,7 +8,7 @@ async function run() {
 
     const { context = {} } = github;
     const { issue } = context.payload;
-    console.log("context",context)
+    console.log("issue",issue.labels)
     if(issue.labels.contains("financial-onboarding")){
       if (context.eventName == 'issues' && (context.payload.action == 'edited' || context.payload.action == 'opened')){
         //check which case is this
