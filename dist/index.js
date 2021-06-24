@@ -6395,9 +6395,18 @@ function removeIgnoreTaskLitsText(text) {
     console.log("eachcheck", eachcheck)
     for(let i=0;i<eachcheck.length;i++){
       if(eachcheck[i].includes("Financial onboarding initial data fetched.")){
-        changeToChecked(eachcheck[i])
+        var checkedoff = changeToChecked(eachcheck[i])
+        eachcheck[i]=checkedoff
       }
     }
+    //merge the financial onboarding list
+    eachcheck = eachcheck.join("\r\n")
+    //merge the entire body
+
+    bodysplit = bodysplit.join("**")
+    console.log("joined issue body",bodysplit)
+    return bodysplit
+
   }
 
 function areChecksCompleted(body){
@@ -6414,6 +6423,7 @@ function changeToChecked(text){
   if(isInComplete){
     var newtext= text.replace("[ ]", "[x]")
     console.log("newtext",newtext)
+    return newtext
   }
 }
 
