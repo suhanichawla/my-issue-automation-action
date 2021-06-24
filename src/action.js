@@ -59,8 +59,9 @@ async function run() {
                 await octokit.rest.issues.createComment({
                   ...context.repo,
                   issue_number: issue.number,
-                  body: "tagging @suhanichawla and @accountpayable"
+                  body: "tagging @suhanichawla"
                 })
+                console.log("just printing issue", issue)
             }
             
           }
