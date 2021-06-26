@@ -6310,7 +6310,7 @@ async function run() {
       //check if basic checks and webhook checks are completed
       if(areBasicChecksCompleted(issue_text_as_array) && areWebhookChecksCompleted(issue_text_as_array)){
         //check if google form label is sent
-        isGoogleFormSent = hasLabel('form-sent')
+        isGoogleFormSent = hasLabel(issue, 'form-sent')
         //if google form is not sent
         if(!isGoogleFormSent){
           //send email with google form here
@@ -6369,7 +6369,6 @@ function hasLabel(issue, labelname){
   let hasLabelName = issue.labels.some(function(el) {
     return el.name === labelname
   });
-  console.log("haslabelname", hasLabelName)
   return hasLabelName
 }
 
