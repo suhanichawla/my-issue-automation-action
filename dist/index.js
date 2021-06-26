@@ -6288,8 +6288,8 @@ async function run() {
   const { issue } = context.payload;
   console.log("issue",issue.labels)
 
-  const hasFinancialUnverifiedLabel= hasLabel('financial-onboarding-unverified')
-  const hasFinancialDraftLabel= hasLabel('financial-onboarding-draft')
+  const hasFinancialUnverifiedLabel= hasLabel(issue, 'financial-onboarding-unverified')
+  const hasFinancialDraftLabel= hasLabel(issue, 'financial-onboarding-draft')
 
   if (context.eventName == 'issues' && (context.payload.action == 'edited' || context.payload.action == 'opened')){
     if(hasFinancialDraftLabel || hasFinancialUnverifiedLabel){
@@ -6365,7 +6365,7 @@ async function run() {
   }
 }
 
-function hasLabel(labelname){
+function hasLabel(issue, labelname){
   return issue.labels.some(function(el) {
     return el.name === labelname
   });
