@@ -6366,10 +6366,11 @@ async function run() {
 }
 
 function hasLabel(issue, labelname){
-  console.log("inside has label", issue)
-  return issue.labels.some(function(el) {
+  let hasLabelName = issue.labels.some(function(el) {
     return el.name === labelname
   });
+  console.log("haslabelname", hasLabelName)
+  return hasLabelName
 }
 
 function areBasicChecksCompleted(text){
