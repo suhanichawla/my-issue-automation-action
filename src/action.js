@@ -57,7 +57,7 @@ async function run() {
       //unverified app steps
       var issue_text_as_array = issue.body.split('**')
       if(areWebhookChecksCompleted(issue_text_as_array)){
-        performRemainingFinancialOnboardingSteps(issue, octokit, octokit)
+        performRemainingFinancialOnboardingSteps(issue, octokit, context)
       }
     }
   }
