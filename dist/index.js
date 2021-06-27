@@ -6425,7 +6425,7 @@ async function run() {
     }else if(hasFinancialUnverifiedLabel){
       //unverified app steps
       var issue_text_as_array = issue.body.split('**')
-      if(areWebhookChecksCompleted(webhook_check)){
+      if(areWebhookChecksCompleted(issue_text_as_array)){
         performRemainingFinancialOnboardingSteps(issue, octokit, octokit)
       }
     }
