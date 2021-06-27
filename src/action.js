@@ -50,7 +50,7 @@ async function run() {
             body: updated_body_with_form_sent_checked,
           });
         }
-        performRemainingFinancialOnboardingSteps(issue_text_as_array, octokit)
+        performRemainingFinancialOnboardingSteps(issue, octokit, context)
       }
     }else if(hasFinancialUnverifiedLabel){
       //unverified app steps
@@ -58,13 +58,14 @@ async function run() {
       var webhook_check_index = bodysplit.indexOf("WebHook Check");
       var webhook_check=removeIgnoreTaskLitsText(bodysplit[webhook_check_index - 1])
       if(areChecksCompleted(basic_checks) && areChecksCompleted(webhook_check)){
-        performRemainingFinancialOnboardingSteps(issue_text_as_array, octokit)
+        performRemainingFinancialOnboardingSteps(issue, octokit, octokit)
       }
     }
   }
 }
 
-async function performRemainingFinancialOnboardingSteps(issue_text_as_array, octokit){
+async function performRemainingFinancialOnboardingSteps(issue, octokit, context){
+  let issue_text_as_array = issue.body.split('**')
   //if google form is already sent
   //check if form data fetched has been marked as completed
   if(checkIfTaskCompleted(issue_text_as_array, "Financial onboarding initial data fetched.")){
