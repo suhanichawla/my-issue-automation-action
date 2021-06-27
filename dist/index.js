@@ -661,7 +661,7 @@ const Context = __importStar(__nccwpck_require__(53));
 const Utils = __importStar(__nccwpck_require__(914));
 // octokit + plugins
 const core_1 = __nccwpck_require__(762);
-const plugin_rest_endpoint_methods_1 = __nccwpck_require__(44);
+const plugin_rest_endpoint_methods_1 = __nccwpck_require__(684);
 const plugin_paginate_rest_1 = __nccwpck_require__(193);
 exports.context = new Context.Context();
 const baseUrl = Utils.getApiBaseUrl();
@@ -2290,7 +2290,7 @@ exports.paginatingEndpoints = paginatingEndpoints;
 
 /***/ }),
 
-/***/ 44:
+/***/ 684:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -6270,14 +6270,106 @@ module.exports = require("zlib");;
 /******/ 	}
 /******/ 	
 /************************************************************************/
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__nccwpck_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/compat */
 /******/ 	
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";/************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
 (() => {
+"use strict";
+// ESM COMPAT FLAG
+__nccwpck_require__.r(__webpack_exports__);
+
+;// CONCATENATED MODULE: ./src/utils.js
+function hasLabel(issue, labelname){
+    let hasLabelName = issue.labels.some(function(el) {
+        return el.name === labelname
+    });
+    return hasLabelName
+}
+
+function areBasicChecksCompleted(text){
+    var basic_checks_index = text.indexOf("Basic Checks");
+    var basic_checks=removeIgnoreTaskLitsText(text[basic_checks_index - 1])
+    return areChecksCompleted(basic_checks)
+}
+
+function areWebhookChecksCompleted(text){
+    var webhook_checks_index = text.indexOf("WebHook Check");
+    var webhook_checks=removeIgnoreTaskLitsText(text[webhook_checks_index - 1])
+    return areChecksCompleted(webhook_checks)
+}
+
+function markFinancialOnboardingTaskAsCompleted(text, taskName){
+    //"Financial onboarding initial form sent."
+    var financial_onboarding_checks_index = text.indexOf("Financial Onboarding");
+    var financial_onboarding_checks=text[financial_onboarding_checks_index+1].split("\r\n")
+    for(let i=0;i<financial_onboarding_checks.length;i++){
+        if(financial_onboarding_checks[i].includes(taskName)){
+        var checkedoff_task = changeToChecked(financial_onboarding_checks[i])
+        financial_onboarding_checks[i]=checkedoff_task
+        }
+    }
+    //merge the financial onboarding list
+    text[financial_onboarding_checks_index+1] = financial_onboarding_checks.join("\r\n")
+    //merge the entire issue body
+    text = text.join("**")
+    return text
+}
+
+function removeIgnoreTaskLitsText(text) {
+    return text.replace(
+        /<!-- ignore-task-list-start -->[\s| ]*(- \[[x| ]\] .+[\s| ]*)+<!-- ignore-task-list-end -->/g,
+        ''
+    )
+}
+  
+function checkIfTaskCompleted(text, taskName){
+    var financial_onboarding_checks_index = text.indexOf("Financial Onboarding");
+    var financial_onboarding_checks=text[financial_onboarding_checks_index+1].split("\r\n")
+    for(let i=0;i<financial_onboarding_checks.length;i++){
+        if(financial_onboarding_checks[i].includes(taskName)){
+        var check=removeIgnoreTaskLitsText(financial_onboarding_checks[i])
+        if(areChecksCompleted(check)){
+            return true
+        }else{
+            return false
+        }
+        }
+    }
+}
+  
+function areChecksCompleted(body){
+    const uncompletedTasks = body.match(/(- \[[ ]\].+)/g)
+    if(uncompletedTasks == null){
+        return true
+    }else{
+        return false
+    }
+}
+  
+function changeToChecked(text){
+    const isInComplete = text.match(/(- \[[ ]\].+)/g)
+    if(isInComplete){
+        var updated_check_item= text.replace("[ ]", "[x]")
+        return updated_check_item
+    }
+}
+;// CONCATENATED MODULE: ./src/action.js
 const core = __nccwpck_require__(186);
 const github = __nccwpck_require__(438);
+
 
 async function run() {
   console.log("Hello world!")
@@ -6335,7 +6427,7 @@ async function run() {
       var bodysplit = issue.body.split('**')
       var webhook_check_index = bodysplit.indexOf("WebHook Check");
       var webhook_check=removeIgnoreTaskLitsText(bodysplit[webhook_check_index - 1])
-      if(areChecksCompleted(basic_checks) && areChecksCompleted(webhook_check)){
+      if(areChecksCompleted(webhook_check)){
         performRemainingFinancialOnboardingSteps(issue, octokit, octokit)
       }
     }
@@ -6366,81 +6458,6 @@ async function performRemainingFinancialOnboardingSteps(issue, octokit, context)
         });
     }
   }  
-}
-
-function hasLabel(issue, labelname){
-  let hasLabelName = issue.labels.some(function(el) {
-    return el.name === labelname
-  });
-  return hasLabelName
-}
-
-function areBasicChecksCompleted(text){
-  var basic_checks_index = text.indexOf("Basic Checks");
-  var basic_checks=removeIgnoreTaskLitsText(text[basic_checks_index - 1])
-  return areChecksCompleted(basic_checks)
-}
-
-function areWebhookChecksCompleted(text){
-  var webhook_checks_index = text.indexOf("WebHook Check");
-  var webhook_checks=removeIgnoreTaskLitsText(text[webhook_checks_index - 1])
-  return areChecksCompleted(webhook_checks)
-}
-
-function markFinancialOnboardingTaskAsCompleted(text, taskName){
-  //"Financial onboarding initial form sent."
-  var financial_onboarding_checks_index = text.indexOf("Financial Onboarding");
-  var financial_onboarding_checks=text[financial_onboarding_checks_index+1].split("\r\n")
-  for(let i=0;i<financial_onboarding_checks.length;i++){
-    if(financial_onboarding_checks[i].includes(taskName)){
-      var checkedoff_task = changeToChecked(financial_onboarding_checks[i])
-      financial_onboarding_checks[i]=checkedoff_task
-    }
-  }
-  //merge the financial onboarding list
-  text[financial_onboarding_checks_index+1] = financial_onboarding_checks.join("\r\n")
-  //merge the entire issue body
-  text = text.join("**")
-  return text
-}
-
-function removeIgnoreTaskLitsText(text) {
-  return text.replace(
-    /<!-- ignore-task-list-start -->[\s| ]*(- \[[x| ]\] .+[\s| ]*)+<!-- ignore-task-list-end -->/g,
-    ''
-  )
-}
-
-function checkIfTaskCompleted(text, taskName){
-  var financial_onboarding_checks_index = text.indexOf("Financial Onboarding");
-  var financial_onboarding_checks=text[financial_onboarding_checks_index+1].split("\r\n")
-  for(let i=0;i<financial_onboarding_checks.length;i++){
-    if(financial_onboarding_checks[i].includes(taskName)){
-      var check=removeIgnoreTaskLitsText(financial_onboarding_checks[i])
-      if(areChecksCompleted(check)){
-        return true
-      }else{
-        return false
-      }
-    }
-  }
-}
-
-function areChecksCompleted(body){
-  const uncompletedTasks = body.match(/(- \[[ ]\].+)/g)
-  if(uncompletedTasks == null){
-      return true
-  }else{
-      return false
-  }
-}
-
-function changeToChecked(text){
-  const isInComplete = text.match(/(- \[[ ]\].+)/g)
-  if(isInComplete){
-    var updated_check_item= text.replace("[ ]", "[x]")
-    return updated_check_item
-  }
 }
 
 run()
