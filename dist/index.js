@@ -6433,29 +6433,34 @@ async function run() {
 }
 
 async function performRemainingFinancialOnboardingSteps(issue, octokit, context){
-  let issue_text_as_array = issue.body.split('**')
-  //if google form is already sent
-  //check if form data fetched has been marked as completed
-  if(checkIfTaskCompleted(issue_text_as_array, "Financial onboarding initial data fetched.")){
-    //check if accounts payable was already tagged, if not
-    if(checkIfTaskCompleted(issue_text_as_array, "@accountspayable tagged to the issue and column updated")){
-      return
-    }else{
-        //tag accounts payable
-        await octokit.rest.issues.createComment({
-          ...context.repo,
-          issue_number: issue.number,
-          body: "tagging @suhanichawla"
-        })
-        //check the tick which says accounts payable has been tagged
-        var updated_body_two= markFinancialOnboardingTaskAsCompleted(issue_text_as_array, "@accountspayable tagged to the issue and column updated")
-        await octokit.rest.issues.update({
-          ...context.repo,
-          issue_number: issue.number,
-          body: updated_body_two,
-        });
-    }
-  }  
+  try{
+    let issue_text_as_array = issue.body.split('**')
+    //if google form is already sent
+    //check if form data fetched has been marked as completed
+    if(checkIfTaskCompleted(issue_text_as_array, "Financial onboarding initial data fetched.")){
+      //check if accounts payable was already tagged, if not
+      if(checkIfTaskCompleted(issue_text_as_array, "@accountspayable tagged to the issue and column updated")){
+        return
+      }else{
+          //tag accounts payable
+          await octokit.rest.issues.createComment({
+            ...context.repo,
+            issue_number: issue.number,
+            body: "tagging @suhanichawla"
+          })
+          //check the tick which says accounts payable has been tagged
+          var updated_body_two= markFinancialOnboardingTaskAsCompleted(issue_text_as_array, "@accountspayable tagged to the issue and column updated")
+          await octokit.rest.issues.update({
+            ...context.repo,
+            issue_number: issue.number,
+            body: updated_body_two,
+          });
+      }
+    }  
+  } catch(e){
+    console.log("error",e)
+  }
+  
 }
 
 run()
