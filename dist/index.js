@@ -6286,7 +6286,7 @@ async function run() {
 
   const { context = {} } = github;
   const { issue } = context.payload;
-  console.log("issue",issue.labels)
+  console.log("issue",issue)
 
   const hasFinancialUnverifiedLabel= hasLabel(issue, 'financial-onboarding-unverified')
   const hasFinancialDraftLabel= hasLabel(issue, 'financial-onboarding-draft')
@@ -6328,28 +6328,7 @@ async function run() {
             body: updated_body_with_form_sent_checked,
           });
         }
-        //if google form is already sent
-        //check if form data fetched has been marked as completed
-        if(check_if_task_completed(issue_text_as_array, "Financial onboarding initial data fetched.")){
-          //check if accounts payable was already tagged, if not
-          if(check_if_task_completed(issue_text_as_array, "@accountspayable tagged to the issue and column updated")){
-            return
-          }else{
-              //tag accounts payable
-              await octokit.rest.issues.createComment({
-                ...context.repo,
-                issue_number: issue.number,
-                body: "tagging @suhanichawla"
-              })
-              //check the tick which says accounts payable has been tagged
-              var updated_body_two= markFinancialOnboardingTaskAsCompleted(issue_text_as_array, "@accountspayable tagged to the issue and column updated")
-              await octokit.rest.issues.update({
-                ...context.repo,
-                issue_number: issue.number,
-                body: updated_body_two,
-              });
-          }
-        }  
+        performRemainingFinancialOnboardingSteps(issue_text_as_array)
       }
     }else if(hasFinancialUnverifiedLabel){
       //unverified app steps
@@ -6357,12 +6336,35 @@ async function run() {
       var webhook_check_index = bodysplit.indexOf("WebHook Check");
       var webhook_check=removeIgnoreTaskLitsText(bodysplit[webhook_check_index - 1])
       if(areChecksCompleted(basic_checks) && areChecksCompleted(webhook_check)){
-        // check mark Financial onboarding initial data fetched
-        //check_form_sent(issue)
-        //check if first recieved is checked, if yes tag accounts payable
+        performRemainingFinancialOnboardingSteps(issue_text_as_array)
       }
     }
   }
+}
+
+async function performRemainingFinancialOnboardingSteps(issue_text_as_array){
+  //if google form is already sent
+  //check if form data fetched has been marked as completed
+  if(checkIfTaskCompleted(issue_text_as_array, "Financial onboarding initial data fetched.")){
+    //check if accounts payable was already tagged, if not
+    if(checkIfTaskCompleted(issue_text_as_array, "@accountspayable tagged to the issue and column updated")){
+      return
+    }else{
+        //tag accounts payable
+        await octokit.rest.issues.createComment({
+          ...context.repo,
+          issue_number: issue.number,
+          body: "tagging @suhanichawla"
+        })
+        //check the tick which says accounts payable has been tagged
+        var updated_body_two= markFinancialOnboardingTaskAsCompleted(issue_text_as_array, "@accountspayable tagged to the issue and column updated")
+        await octokit.rest.issues.update({
+          ...context.repo,
+          issue_number: issue.number,
+          body: updated_body_two,
+        });
+    }
+  }  
 }
 
 function hasLabel(issue, labelname){
@@ -6408,7 +6410,7 @@ function removeIgnoreTaskLitsText(text) {
   )
 }
 
-function check_if_task_completed(text, taskName){
+function checkIfTaskCompleted(text, taskName){
   var financial_onboarding_checks_index = text.indexOf("Financial Onboarding");
   var financial_onboarding_checks=text[financial_onboarding_checks_index+1].split("\r\n")
   for(let i=0;i<financial_onboarding_checks.length;i++){
