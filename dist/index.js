@@ -6403,6 +6403,7 @@ async function run() {
       if(areBasicChecksCompleted(issue_text_as_array) && areWebhookChecksCompleted(issue_text_as_array)){
         //check if google form label is sent
         isGoogleFormSent = hasLabel(issue, 'form-sent')
+        console.log("google form sent", isGoogleFormSent)
         //if google form is not sent
         if(!isGoogleFormSent){
           //send email with google form here
