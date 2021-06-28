@@ -9,7 +9,7 @@ async function run() {
 
   const { context = {} } = github;
   const { issue } = context.payload;
-  console.log("issue",issue)
+  // console.log("issue",issue)
 
   const hasFinancialUnverifiedLabel= hasLabel(issue, 'financial-onboarding-unverified')
   const hasFinancialDraftLabel= hasLabel(issue, 'financial-onboarding-draft')
@@ -33,7 +33,7 @@ async function run() {
       //check if basic checks and webhook checks are completed
       if(areBasicChecksCompleted(issue_text_as_array) && areWebhookChecksCompleted(issue_text_as_array)){
         //check if google form label is sent
-        isGoogleFormSent = hasLabel(issue, 'form-sent')
+        let isGoogleFormSent = hasLabel(issue, 'form-sent')
         console.log("google form sent", isGoogleFormSent)
         //if google form is not sent
         if(!isGoogleFormSent){
